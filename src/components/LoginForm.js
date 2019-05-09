@@ -1,24 +1,50 @@
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Card from './common/Card';
 import CardItem from './common/CardItem';
 import Button from './common/Button'
 import Input from './common/Input';
-//import { Card, CardItem, Button } from './common';
+import firebase from '../firebase';
+import Spinner from './common/Spinner';
 
 export default class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             email: '',
-            password: ''
+            password: '',
+            error: '',
+            loading: false
         }
-        this.onLoginPress = this.onLoginPress.bind(this)
+        this.onLoginPress = this.onLoginPress.bind(this);
+        this.onAuthFailed = this.onAuthFailed.bind(this);
+        this.showButtonOrSpinner = this.showButtonOrSpinner.bind(this);
     }
 
     onLoginPress() {
-        console.log(`email: ${this.state.email}`);
-        console.log(`password: ${this.state.password}`)
+        const { email, password } = this.state;
+
+        this.setState({loading: true, error: ''});
+
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .catch(() => {
+                firebase.auth().createUserWithEmailAndPassword(email, password)
+                    .catch(this.onAuthFailed)
+            })
+    }
+
+    onAuthFailed() {
+        this.setState({error: 'Authenticatiom Failed', loading: false});
+    }
+
+    showButtonOrSpinner() {
+        if(this.state.loading) {
+            return <Spinner color='#0000ff' size='large'/>
+        }
+
+        return(
+            <Button onPress={this.onLoginPress}>Login</Button>
+        );
     }
 
     render() {
@@ -42,12 +68,21 @@ export default class LoginForm extends Component {
                     />
                 </CardItem>
 
+                <Text style={styles.errorMessage}>{this.state.error}</Text>
+
                 <CardItem>
-                    <Button onPress={this.onLoginPress}>Login</Button>
+                    { this.showButtonOrSpinner() }
                 </CardItem>
             </Card>
         );
     }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    errorMessage: {
+        fontSize: 16,
+        alignSelf: 'center',
+        color: '#FF0000',
+        marginTop: 5
+    }
+});
