@@ -19,6 +19,7 @@ export default class LoginForm extends Component {
         this.onLoginPress = this.onLoginPress.bind(this);
         this.onAuthFailed = this.onAuthFailed.bind(this);
         this.showButtonOrSpinner = this.showButtonOrSpinner.bind(this);
+        this.onAuthSucsess = this.onAuthSucsess.bind(this);
     }
 
     onLoginPress() {
@@ -27,10 +28,21 @@ export default class LoginForm extends Component {
         this.setState({loading: true, error: ''});
 
         firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(this.onAuthSucsess)
             .catch(() => {
                 firebase.auth().createUserWithEmailAndPassword(email, password)
+                    .then(this.onAuthSucsess)
                     .catch(this.onAuthFailed)
             })
+    }
+
+    onAuthSucsess() {
+        this.setState({
+            email: '',
+            password: '',
+            error: '',
+            loading: false
+        });
     }
 
     onAuthFailed() {
@@ -53,6 +65,7 @@ export default class LoginForm extends Component {
                 <CardItem>
                     <Input 
                         label='Email'
+                        value={this.state.email}
                         placeholder='Enter your email'
                         secureTextEntry={false}
                         onChangeText={ email => this.setState({email}) }
@@ -62,6 +75,7 @@ export default class LoginForm extends Component {
                 <CardItem>
                     <Input
                     label='Password'
+                    value={this.state.password}
                     secureTextEntry={true}
                     placeholder='Enter Your Password'
                     onChangeText={ password => this.setState({password}) }

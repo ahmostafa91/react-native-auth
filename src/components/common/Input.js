@@ -8,12 +8,13 @@ const Input = (props) => {
                 {props.label}
             </Text>
             <TextInput 
-            style={styles.input}
-            autoCapitalize='none'
-            autoCorrect={false}
-            secureTextEntry={props.secureTextEntry}
-            placeholder={props.placeholder}
-            onChangeText={props.onChangeText}
+                style={styles.input}
+                value={props.value}
+                autoCapitalize='none'
+                autoCorrect={false}
+                secureTextEntry={props.secureTextEntry}
+                placeholder={props.placeholder}
+                onChangeText={props.onChangeText}
             />
         </View>
     );
